@@ -60,13 +60,18 @@ function resample(points, n = 32) {
   return out;
 }
 
-/** Average point-to-point distance between two equal-length paths. */
-function pathDistance(a, b) {
-  const n = Math.min(a.length, b.length);
-  if (!n) return 1;
-  let sum = 0;
-  for (let i = 0; i < n; i++) sum += dist(a[i], b[i]);
-  return sum / n;
+/** Compare the outline of two paths, independent of stroke order. */
+function shapeDistance(a, b) {
+  const averageClosest = (from, to) => {
+    let total = 0;
+    for (const p of from) {
+      let closest = Infinity;
+      for (const q of to) closest = Math.min(closest, dist(p, q));
+      total += closest;
+    }
+    return total / Math.max(from.length, 1);
+  };
+  return (averageClosest(a, b) + averageClosest(b, a)) / 2;
 }
 
 /**
@@ -121,9 +126,7 @@ export class RuneTracer {
     this.isDrawing = false;
     this.currentRune = null;
     this.layout = null; // { x, y, w, h } screen rect for rune plane
-    this.thresholdGood = 0.14;
-    this.thresholdOk = 0.2;
-    this.minPathPoints = 8;
+    this.minPathPoints = 6;
   }
 
   setLayout(rect) {
@@ -185,7 +188,7 @@ export class RuneTracer {
     // Find closest target vertex progression
     let nextIndex = 0;
     let covered = 0;
-    const corridor = Math.max(this.layout?.w || 200, this.layout?.h || 200) * 0.12;
+    const corridor = Math.max(this.layout?.w || 200, this.layout?.h || 200) * 0.23;
 
     // Greedy advance along target vertices based on proximity
     for (let i = 0; i < user.length; i++) {
@@ -230,31 +233,22 @@ export class RuneTracer {
     // Require path to span a reasonable portion of the rune plane
     const userNorm = normalizePath(this.userPath);
     const targetNorm = normalizePath(target);
-    const u = resample(userNorm, 48);
-    const t = resample(targetNorm, 48);
+    const u = resample(userNorm, 64);
+    const t = resample(targetNorm, 64);
 
-    const d = pathDistance(u, t);
+    const d = shapeDistance(u, t);
     // Also try reversed? No — order matters for casting.
     // Score: lower distance better. Map to 0..1 quality.
-    const score = Math.max(0, 1 - d / 0.45);
+    const score = Math.max(0, 1 - d / 0.24);
 
-    // Endpoint proximity bonus/penalty
-    const startOk = dist(this.userPath[0], target[0]) < (this.layout?.w || 200) * 0.22;
-    const endOk =
-      dist(this.userPath[this.userPath.length - 1], target[target.length - 1]) <
-      (this.layout?.w || 200) * 0.22;
-
-    let ok = score >= 0.45 && startOk;
-    // Soften end requirement if overall shape is good
-    if (score >= 0.62) ok = true;
-    if (!startOk && score < 0.7) ok = false;
+    const ok = score >= 0.48;
 
     let grade = "miss";
     if (ok && score >= 0.75) grade = "great";
     else if (ok) grade = "good";
     else if (score >= 0.35) grade = "close";
 
-    return { ok, score, grade, startOk, endOk };
+    return { ok, score, grade };
   }
 }
 

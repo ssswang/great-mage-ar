@@ -63,11 +63,12 @@ export class ARRenderer {
   }
 
   _updateRuneLayout() {
-    // Reserve the upper field for tracing so the rune never competes with the book.
-    const size = Math.min(this.w, this.h) * 0.19;
+    // Give hands enough room to draw. The old 19% square was sized more like an
+    // icon than a gesture target, especially on a phone camera preview.
+    const size = Math.min(this.w * 0.72, this.h * 0.44);
     this.runeLayout = {
       x: (this.w - size) / 2,
-      y: this.h * 0.22,
+      y: Math.max(86, this.h * 0.16),
       w: size,
       h: size,
     };

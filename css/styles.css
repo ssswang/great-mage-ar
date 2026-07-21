@@ -426,8 +426,14 @@ html, body {
   top: 56px;
   right: 16px;
   z-index: 6;
-  display: flex;
-  gap: 8px;
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(232, 199, 106, 0.4);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(42, 20, 17, 0.92), rgba(13, 8, 12, 0.88));
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 230, 160, 0.12);
+  backdrop-filter: blur(14px);
   pointer-events: auto;
 }
 
@@ -436,11 +442,14 @@ html, body {
 .chip {
   pointer-events: auto;
   cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: var(--ui-bg);
+  min-width: 180px;
+  min-height: 82px;
+  border: 2px solid rgba(232, 199, 106, 0.5);
+  background: rgba(255,255,255,0.08);
   color: var(--parchment);
-  font-size: 12px;
-  padding: 8px 12px;
+  font-size: 22px;
+  font-weight: 600;
+  padding: 18px 28px;
   border-radius: 999px;
   backdrop-filter: blur(10px);
   font-family: var(--font-ui);
@@ -450,6 +459,22 @@ html, body {
   border-color: var(--gold);
   color: var(--gold-bright);
   box-shadow: 0 0 12px rgba(232, 199, 106, 0.3);
+}
+
+@media (max-width: 520px) {
+  #soft-controls {
+    top: 52px;
+    right: 10px;
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .chip {
+    min-width: 142px;
+    min-height: 62px;
+    font-size: 17px;
+    padding: 12px 18px;
+  }
 }
 
 #input-status {

@@ -17,6 +17,7 @@
 import { ARRenderer } from "./renderer.js";
 import { SPELLS, RuneTracer, createDemoAnimator } from "./runes.js";
 import { InputManager, VoiceCommands } from "./input.js";
+import { AudioManager } from "./audio.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -51,6 +52,7 @@ class Game {
     this.inputStatus = $("input-status");
     this.inputLabel = $("input-label");
     this.btnVoice = $("btn-voice");
+    this.btnAudio = $("btn-audio");
 
     this.renderer = new ARRenderer(this.canvas);
     this.tracer = new RuneTracer();
@@ -75,6 +77,7 @@ class Game {
     });
 
     this.voice = new VoiceCommands((cmd) => this._onVoice(cmd));
+    this.audio = new AudioManager();
 
     this._bindUI();
     this._loop = this._loop.bind(this);
@@ -95,9 +98,16 @@ class Game {
       this.btnVoice.classList.toggle("active", on);
       this.setCaption(on ? "Voice on — try “next”, “again”, or “cast”." : "Voice off.");
     });
+    this.btnAudio.addEventListener("click", () => {
+      const on = this.audio.toggle();
+      this._updateAudioButton();
+      this.setCaption(on ? "Audio on. Spoken guidance and spell sounds are enabled." : "Audio off.");
+    });
   }
 
   async start(withCamera) {
+    this.audio.start();
+    this._updateAudioButton();
     this.useCamera = withCamera;
     this.startPanel.classList.add("hidden");
     this.endPanel.classList.add("hidden");
@@ -208,7 +218,14 @@ class Game {
     this.captionQueue = setTimeout(() => {
       this.caption.textContent = text;
       this.caption.style.opacity = "1";
+      this.audio.speak(text);
     }, 120);
+  }
+
+  _updateAudioButton() {
+    const on = this.audio.enabled;
+    this.btnAudio.textContent = on ? "🔊 Audio: On" : "🔇 Audio: Off";
+    this.btnAudio.classList.toggle("active", on);
   }
 
   setHint(text) {
@@ -307,7 +324,7 @@ class Game {
           feedbackState: "idle",
         });
         this.setCaption(
-          `Trace the ${rune.label} rune. Start at the green glow.`
+          `Trace the ${rune.label} rune. Match its shape in your own way.`
         );
         this.setHint(
           this.input.mode === "hand"
@@ -363,6 +380,7 @@ class Game {
       case PHASE.CAST: {
         const L = layout;
         this.renderer.spawnFireball(L.x + L.w / 2, L.y + L.h * 0.45);
+        this.audio.cast();
         this.setCaption("Flame Sigil — cast! The fireball answers your hand.");
         this.setHint("");
         break;
@@ -402,18 +420,8 @@ class Game {
       return;
     }
     if (!this.canTrace) return;
-    // Only start if near start dot (when guided) or anywhere (practice with start glow)
-    const start = this.tracer.getTargetScreenPoints()[0];
-    if (start && !this.unguided) {
-      const d = Math.hypot(x - start.x, y - start.y);
-      // Hand tracking has a little more natural jitter than a pointer.
-      const corridor = Math.max(this.tracer.layout.w, this.tracer.layout.h) *
-        (this.input.mode === "hand" ? 0.34 : 0.18);
-      if (d > corridor) {
-        this.setHint("Start at the green glowing point");
-        return;
-      }
-    }
+    // Shape recognition is start-point independent: begin wherever feels most
+    // comfortable, then draw the rune's overall silhouette.
     this.tracer.start(x, y);
     this.fingertip.classList.add("drawing");
     this.fingertip.classList.remove("offpath");
@@ -455,6 +463,7 @@ class Game {
     const result = this.tracer.evaluate();
 
     if (result.ok) {
+      this.audio.success();
       this.renderer.setRuneVisual({
         userPath: this.tracer.userPath,
         feedbackState: "success",
@@ -494,6 +503,7 @@ class Game {
         }
       }, 650);
     } else {
+      this.audio.fail();
       // Auto-retry — no Retry button
       this.renderer.setRuneVisual({
         userPath: this.tracer.userPath,

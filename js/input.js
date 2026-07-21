@@ -21,6 +21,7 @@ export class InputManager {
     this._handActive = false;
     this._pinchDown = false;
     this._raf = null;
+    this._smoothedTip = null;
 
     this._onPointerMove = this._onPointerMove.bind(this);
     this._onPointerDown = this._onPointerDown.bind(this);
@@ -113,6 +114,7 @@ export class InputManager {
 
   stopHands() {
     this._handActive = false;
+    this._smoothedTip = null;
     if (this._raf) cancelAnimationFrame(this._raf);
     this._raf = null;
     try {
@@ -146,8 +148,18 @@ export class InputManager {
           const renderH = videoH * scale;
           const left = (window.innerWidth - renderW) / 2;
           const top = (window.innerHeight - renderH) / 2;
-          const x = Math.max(0, Math.min(window.innerWidth, left + (1 - tip.x) * renderW));
-          const y = Math.max(0, Math.min(window.innerHeight, top + tip.y * renderH));
+          const rawX = Math.max(0, Math.min(window.innerWidth, left + (1 - tip.x) * renderW));
+          const rawY = Math.max(0, Math.min(window.innerHeight, top + tip.y * renderH));
+
+          // Hand landmarks naturally jitter by a few pixels. Smooth the visual
+          // fingertip before it becomes a drawing point so a steady finger makes
+          // a steady rune without adding noticeable lag.
+          if (!this._smoothedTip) this._smoothedTip = { x: rawX, y: rawY };
+          const smoothing = 0.46;
+          this._smoothedTip.x += (rawX - this._smoothedTip.x) * smoothing;
+          this._smoothedTip.y += (rawY - this._smoothedTip.y) * smoothing;
+          const x = this._smoothedTip.x;
+          const y = this._smoothedTip.y;
           this.x = x;
           this.y = y;
           this.mode = "hand";
