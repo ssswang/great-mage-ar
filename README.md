@@ -15,11 +15,11 @@ Browser-based **pass-through AR demo** of the spell-learning loop:
 | Feedback | Mid-fi response |
 |---|---|
 | Paths too complex | Straight **geometric** runes (triangle, chevron, bolt) |
-| Boring spellbook | Leather cover, gold engraving, pulse glow, page open |
+| Boring spellbook | Leather cover, gold engraving |
 | Need reward | Animated **fireball** + particles on completion |
 | Ghost path states unclear | Color states: idle blue · on-path green · off-path red |
 | Mouse cursor broke immersion | **Glowing fingertip** (cursor hidden during play) |
-| Captions hard to find | **Bottom caption bar** (TV-style) |
+| Captions hard to find | **Make caption on spellbook** |
 | Retry buttons kill flow | **Auto-retry** / **auto-advance** (no confirm UI) |
 | Want proof of learning | **Unguided practice** mode (no ghost path) |
 | Accuracy % caused anxiety | No score labels — only qualitative success/fail |
