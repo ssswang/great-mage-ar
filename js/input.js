@@ -134,23 +134,40 @@ export class InputManager {
           // Index fingertip = landmark 8
           const tip = result.landmarks[0][8];
           const thumb = result.landmarks[0][4];
-          // Video is mirrored in CSS; map accordingly
-          const x = (1 - tip.x) * window.innerWidth;
-          const y = tip.y * window.innerHeight;
+          const wrist = result.landmarks[0][0];
+          const middleBase = result.landmarks[0][9];
+
+          // The camera uses object-fit: cover. Map landmarks through that same
+          // crop so the tracked fingertip lines up with what the user sees.
+          const videoW = this._video.videoWidth || window.innerWidth;
+          const videoH = this._video.videoHeight || window.innerHeight;
+          const scale = Math.max(window.innerWidth / videoW, window.innerHeight / videoH);
+          const renderW = videoW * scale;
+          const renderH = videoH * scale;
+          const left = (window.innerWidth - renderW) / 2;
+          const top = (window.innerHeight - renderH) / 2;
+          const x = Math.max(0, Math.min(window.innerWidth, left + (1 - tip.x) * renderW));
+          const y = Math.max(0, Math.min(window.innerHeight, top + tip.y * renderH));
           this.x = x;
           this.y = y;
           this.mode = "hand";
 
-          const pinch =
-            Math.hypot(tip.x - thumb.x, tip.y - thumb.y) < 0.07;
+          // Scale pinch tolerance to the detected hand. This is much more
+          // reliable than a fixed distance when the hand is near or far away.
+          const handSize = Math.hypot(wrist.x - middleBase.x, wrist.y - middleBase.y);
+          const pinchDistance = Math.hypot(tip.x - thumb.x, tip.y - thumb.y);
+          const pinch = pinchDistance < Math.max(0.075, handSize * 0.52);
 
           if (pinch && !this._pinchDown) {
             this._pinchDown = true;
             this.isDown = true;
             this.onDown?.(x, y);
+            // Begin the visible stroke immediately on the pinch frame.
+            this.onMove?.(x, y, true);
           } else if (!pinch && this._pinchDown) {
             this._pinchDown = false;
             this.isDown = false;
+            this.onMove?.(x, y, true);
             this.onUp?.(x, y);
           } else if (this.isDown) {
             this.onMove?.(x, y, true);

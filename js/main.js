@@ -406,7 +406,9 @@ class Game {
     const start = this.tracer.getTargetScreenPoints()[0];
     if (start && !this.unguided) {
       const d = Math.hypot(x - start.x, y - start.y);
-      const corridor = Math.max(this.tracer.layout.w, this.tracer.layout.h) * 0.18;
+      // Hand tracking has a little more natural jitter than a pointer.
+      const corridor = Math.max(this.tracer.layout.w, this.tracer.layout.h) *
+        (this.input.mode === "hand" ? 0.34 : 0.18);
       if (d > corridor) {
         this.setHint("Start at the green glowing point");
         return;
