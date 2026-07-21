@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Journey to Be the Great Mage — Mid-Fi AR Demo</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Camera passthrough (AR environment) -->
+  <video id="camera" autoplay playsinline muted></video>
+  <div id="camera-fallback" aria-hidden="true"></div>
+
+  <!-- 3D / 2D AR canvas -->
+  <canvas id="ar-canvas"></canvas>
+
+  <!-- Glowing fingertip cursor (not a mouse cursor) -->
+  <div id="fingertip" class="hidden" aria-hidden="true">
+    <div class="tip-core"></div>
+    <div class="tip-glow"></div>
+    <div class="tip-trail"></div>
+  </div>
+
+  <!-- HUD: minimal, captions bottom -->
+  <div id="hud">
+    <header id="top-bar">
+      <div class="brand">
+        <span class="brand-mark">✦</span>
+        <span>Great Mage</span>
+      </div>
+      <div id="mode-badge">Mid-Fi AR Demo</div>
+    </header>
+
+    <div id="spell-progress" class="hidden" aria-live="polite">
+      <div class="rune-dots" id="rune-dots"></div>
+      <span id="spell-name">Flame Sigil</span>
+    </div>
+
+    <!-- Bottom captions (per user testing) -->
+    <div id="caption-bar">
+      <p id="caption">Welcome, apprentice. Ready your hands for magic.</p>
+      <div id="hint" class="hidden"></div>
+    </div>
+
+    <!-- Start / control panel -->
+    <div id="start-panel" class="panel">
+      <div class="panel-inner">
+        <p class="eyebrow">INF2310H · Group 11 · Task 3</p>
+        <h1>Journey to Be<br/>the Great Mage</h1>
+        <p class="lede">
+          Learn a new spell by watching glowing runes, tracing them in space with your hand,
+          then casting a fireball into your room.
+        </p>
+        <ul class="feature-list">
+          <li>Webcam passthrough (AR)</li>
+          <li>Bare-hand or pointer tracing</li>
+          <li>Live rune feedback · fireball reward</li>
+        </ul>
+        <div class="btn-row">
+          <button id="btn-start-ar" class="btn primary">Start with Camera</button>
+          <button id="btn-start-mouse" class="btn ghost">Demo without Camera</button>
+        </div>
+        <p class="fineprint">
+          Camera stays local in your browser. Sitting play is supported — keep gestures near chest height.
+        </p>
+      </div>
+    </div>
+
+    <!-- Voice / soft controls (between sequences only) -->
+    <div id="soft-controls" class="hidden">
+      <button id="btn-voice" class="chip" title="Toggle voice commands">🎤 Voice</button>
+      <button id="btn-restart" class="chip">↺ Restart</button>
+    </div>
+
+    <!-- Debug / input mode -->
+    <div id="input-status" class="hidden">
+      <span id="input-label">Pointer</span>
+    </div>
+  </div>
+
+  <!-- End card -->
+  <div id="end-panel" class="panel hidden">
+    <div class="panel-inner">
+      <p class="eyebrow">Spell learned</p>
+      <h2>You cast the Flame Sigil</h2>
+      <p class="lede">The fireball answered your hand. Practice again, or try without the ghost path.</p>
+      <div class="btn-row">
+        <button id="btn-again" class="btn primary">Cast Again</button>
+        <button id="btn-practice" class="btn ghost">Unguided Practice</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
