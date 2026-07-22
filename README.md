@@ -17,8 +17,6 @@ Camera access requires a local server (or `localhost`):
 ```bash
 # From this folder — any static server works
 npx --yes serve .
-# or
-python -m http.server 8080
 ```
 
 Then open the URL shown (e.g. `http://localhost:3000`).
