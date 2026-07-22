@@ -108,12 +108,11 @@ export const SPELLS = {
       {
         id: "release",
         label: "Release",
-        // Vertical bolt with base cross
+        // Simple L shape
         points: [
-          { x: 0.5, y: 0.15 },
-          { x: 0.5, y: 0.85 },
-          { x: 0.28, y: 0.85 },
-          { x: 0.72, y: 0.85 },
+          { x: 0.35, y: 0.15 },
+          { x: 0.35, y: 0.85 },
+          { x: 0.82, y: 0.85 },
         ],
       },
     ],

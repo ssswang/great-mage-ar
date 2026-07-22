@@ -340,7 +340,7 @@ class Game {
         );
         this.setHint(
           this.input.mode === "hand"
-            ? "Pinch to draw · release to finish"
+            ? "Pinch to draw · open your hand to finish"
             : "Hold pointer to draw · release to finish"
         );
         break;
@@ -441,6 +441,7 @@ class Game {
 
   _onMove(x, y, down) {
     this._updateFingertip(x, y, down || this.tracer.isDrawing);
+    if (this._tryOpenBook(x, y)) return;
     if (this.tracer.isDrawing) {
       this.tracer.move(x, y);
       const fb = this.tracer.liveFeedback();
@@ -457,13 +458,8 @@ class Game {
     this._updateFingertip(x, y, false);
     this.fingertip.classList.remove("drawing", "offpath");
     if (this.phase === PHASE.BOOK_APPEAR && this.bookReadyForSwipe) {
-      const start = this.bookSwipeStart;
-      this.bookSwipeStart = null;
-      const dx = start ? x - start.x : 0;
-      const dy = start ? y - start.y : 0;
-      if (dx < -65 && Math.abs(dy) < 110) {
-        this._enter(PHASE.BOOK_OPEN);
-      } else {
+      if (!this._tryOpenBook(x, y)) {
+        this.bookSwipeStart = null;
         this.setHint("Swipe left across the book to open it");
       }
       return;
@@ -558,6 +554,24 @@ class Game {
     }
   }
 
+  _tryOpenBook(x, y) {
+    if (this.phase !== PHASE.BOOK_APPEAR || !this.bookReadyForSwipe || !this.bookSwipeStart) {
+      return false;
+    }
+    const dx = x - this.bookSwipeStart.x;
+    const dy = y - this.bookSwipeStart.y;
+    // Camera tracking has natural jitter, so accept a short, mostly horizontal
+    // sweep. Detect it mid-pinch as well as on release.
+    const minDistance = this.input.mode === "hand" ? 32 : 60;
+    const maxVerticalDrift = this.input.mode === "hand" ? 170 : 110;
+    if (dx <= -minDistance && Math.abs(dy) <= maxVerticalDrift) {
+      this.bookSwipeStart = null;
+      this._enter(PHASE.BOOK_OPEN);
+      return true;
+    }
+    return false;
+  }
+
   _loop(ts) {
     const dt = Math.min(0.05, (ts - this.lastTs) / 1000 || 0.016);
     this.lastTs = ts;
@@ -596,7 +610,7 @@ class Game {
           this.bookReadyForSwipe = true;
           this.setHint(
             this.input.mode === "hand"
-              ? "Pinch and sweep left to open"
+              ? "Pinch, then sweep left a short distance to open"
               : "Swipe left across the book to open"
           );
         }

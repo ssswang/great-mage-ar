@@ -239,7 +239,7 @@ html, body {
 #caption-bar {
   position: fixed;
   left: 50%;
-  top: 72%;
+  top: 76%;
   transform: translate(-50%, -50%);
   width: min(360px, 48vw);
   margin: 0;
@@ -423,8 +423,8 @@ html, body {
 /* Soft controls */
 #soft-controls {
   position: fixed;
-  bottom: 18px;
-  right: 16px;
+  bottom: 14px;
+  left: 50%;
   z-index: 6;
   display: flex;
   gap: 10px;
@@ -435,8 +435,8 @@ html, body {
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 230, 160, 0.12);
   backdrop-filter: blur(14px);
   pointer-events: auto;
-  transform: perspective(900px) rotateX(8deg) rotateY(-7deg);
-  transform-origin: right bottom;
+  transform: translate(-50%, -50%) perspective(900px) rotateX(8deg) rotateY(-7deg);
+  transform-origin: center center;
   transform-style: preserve-3d;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -451,7 +451,7 @@ html, body {
 }
 
 #soft-controls:hover {
-  transform: perspective(900px) rotateX(4deg) rotateY(-3deg) translateY(-3px);
+  transform: translate(-50%, -50%) perspective(900px) rotateX(4deg) rotateY(-3deg) translateY(-3px);
   box-shadow: 0 20px 44px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 230, 160, 0.18);
 }
 
@@ -496,8 +496,8 @@ html, body {
 
 @media (max-width: 520px) {
   #soft-controls {
-    bottom: 10px;
-    right: 10px;
+    bottom: 8px;
+    left: 50%;
     padding: 10px;
     gap: 8px;
   }
@@ -540,7 +540,7 @@ body.playing .chip {
 @media (max-width: 520px) {
   .panel-inner { padding: 24px 18px; }
   #caption { font-size: 14px; padding: 10px 14px; }
-  #caption-bar { top: 73%; width: min(300px, 80vw); }
+  #caption-bar { top: 72%; width: min(300px, 80vw); }
   #hint { width: 100%; font-size: 12px; }
   .btn-row { flex-direction: column; }
   .btn { width: 100%; }
