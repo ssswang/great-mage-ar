@@ -221,6 +221,12 @@ class Game {
     }, 120);
   }
 
+  clearCaption() {
+    clearTimeout(this.captionQueue);
+    this.caption.style.opacity = "0";
+    this.caption.textContent = "";
+  }
+
   _updateAudioButton() {
     const on = this.audio.enabled;
     this.btnAudio.textContent = on ? "🔊 Audio: On" : "🔇 Audio: Off";
@@ -257,6 +263,7 @@ class Game {
       case PHASE.BOOK_APPEAR:
         this.bookReadyForSwipe = false;
         this.bookSwipeStart = null;
+        this.bookAppearCaptionDismissed = false;
         this.renderer.setSpellbook({
           visible: true,
           open: 0,
@@ -279,12 +286,12 @@ class Game {
         break;
 
       case PHASE.BOOK_OPEN:
+        this.bookOpenCaptionDismissed = false;
         this.setCaption("It opens — leather warm with old gold light.");
         break;
 
       case PHASE.PAGE_FLIP:
         this.renderer.setSpellbook({ page: 0, yOffset: 90 });
-        this.setCaption("Flip through the apprentice notes… Flame Sigil awaits.");
         this.setHint(this.voice.supported ? 'Say “next” or wait' : "Wait a moment…");
         break;
 
@@ -587,12 +594,15 @@ class Game {
         });
         if (t >= 1 && !this.bookReadyForSwipe) {
           this.bookReadyForSwipe = true;
-          this.setCaption("The spellbook waits. Swipe left to open its cover.");
           this.setHint(
             this.input.mode === "hand"
               ? "Pinch and sweep left to open"
               : "Swipe left across the book to open"
           );
+        }
+        if (this.phaseT >= 5 && !this.bookAppearCaptionDismissed) {
+          this.bookAppearCaptionDismissed = true;
+          this.clearCaption();
         }
         break;
       }
@@ -603,7 +613,11 @@ class Game {
           open: easeInOut(t),
           glow: 0.8 + 0.2 * Math.sin(this.phaseT * 3),
         });
-        if (t >= 1) this._enter(PHASE.PAGE_FLIP);
+        if (this.phaseT >= 5 && !this.bookOpenCaptionDismissed) {
+          this.bookOpenCaptionDismissed = true;
+          this.clearCaption();
+          this._enter(PHASE.PAGE_FLIP);
+        }
         break;
       }
 
