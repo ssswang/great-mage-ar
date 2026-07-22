@@ -10,21 +10,6 @@ Browser-based **pass-through AR demo** of the spell-learning loop:
 2. **Trace** — draw runes in space with pointer or hand; live feedback  
 3. **Combine & cast** — fireball reward on success  
 
-## Design decisions reflected from low-fi testing
-
-| Feedback | Mid-fi response |
-|---|---|
-| Paths too complex | Straight **geometric** runes (triangle, chevron, bolt) |
-| Boring spellbook | Leather cover, gold engraving |
-| Need reward | Animated **fireball** + particles on completion |
-| Ghost path states unclear | Color states: idle blue · on-path green · off-path red |
-| Mouse cursor broke immersion | **Glowing fingertip** (cursor hidden during play) |
-| Captions hard to find | **Make caption on spellbook** |
-| Retry buttons kill flow | **Auto-retry** / **auto-advance** (no confirm UI) |
-| Want proof of learning | **Unguided practice** mode (no ghost path) |
-| Accuracy % caused anxiety | No score labels — only qualitative success/fail |
-| Sitting / fatigue | Gestures in center of view; no room-scale locomotion |
-
 ## Run locally
 
 Camera access requires a local server (or `localhost`):
@@ -67,7 +52,9 @@ great-mage-ar/
 
 ## Hardware note (from design doc)
 
-Production target is **pass-through MR headset / AR glasses** with bare-hand tracking. This mid-fi build approximates that on a laptop/phone for critique and usability testing without a headset.
+Production target is **pass-through MR headset / AR glasses** with bare-hand tracking. 
+
+This mid-fi build approximates that on a laptop/phone for critique and usability testing without a headset.
 
 ## License
 
