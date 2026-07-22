@@ -88,15 +88,14 @@ class Game {
     $("btn-start-mouse").addEventListener("click", () => this.start(false));
     $("btn-again").addEventListener("click", () => this.restart(false));
     $("btn-practice").addEventListener("click", () => this.restart(true));
-    $("btn-restart").addEventListener("click", () => this.restart(this.unguided));
     this.btnVoice.addEventListener("click", () => {
       if (!this.voice.supported) {
         this.setCaption("Voice commands are not supported in this browser.");
         return;
       }
       const on = this.voice.toggle();
-      this.btnVoice.classList.toggle("active", on);
-      this.setCaption(on ? "Voice on — try “next”, “again”, or “cast”." : "Voice off.");
+      this._updateVoiceButton();
+      this.setCaption(on ? "Microphone on — try “next”, “again”, or “cast”." : "Microphone off.");
     });
     this.btnAudio.addEventListener("click", () => {
       const on = this.audio.toggle();
@@ -226,6 +225,12 @@ class Game {
     const on = this.audio.enabled;
     this.btnAudio.textContent = on ? "🔊 Audio: On" : "🔇 Audio: Off";
     this.btnAudio.classList.toggle("active", on);
+  }
+
+  _updateVoiceButton() {
+    const on = this.voice.active;
+    this.btnVoice.textContent = on ? "🎤 Mic: On" : "🎤 Mic: Off";
+    this.btnVoice.classList.toggle("active", on);
   }
 
   setHint(text) {
