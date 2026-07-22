@@ -435,11 +435,30 @@ html, body {
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 230, 160, 0.12);
   backdrop-filter: blur(14px);
   pointer-events: auto;
+  transform: perspective(900px) rotateX(8deg) rotateY(-7deg);
+  transform-origin: right bottom;
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+#soft-controls::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, rgba(255, 234, 169, 0.18), transparent 38%);
+  pointer-events: none;
+}
+
+#soft-controls:hover {
+  transform: perspective(900px) rotateX(4deg) rotateY(-3deg) translateY(-3px);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 230, 160, 0.18);
 }
 
 #soft-controls.hidden { display: none; }
 
 .chip {
+  position: relative;
   pointer-events: auto;
   cursor: pointer;
   min-width: 142px;
@@ -453,6 +472,20 @@ html, body {
   border-radius: 999px;
   backdrop-filter: blur(10px);
   font-family: var(--font-ui);
+  box-shadow: 0 7px 0 rgba(33, 15, 12, 0.75), 0 12px 18px rgba(0, 0, 0, 0.24);
+  transform: translateZ(16px);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+
+.chip:hover {
+  background: rgba(255, 234, 169, 0.14);
+  box-shadow: 0 10px 0 rgba(33, 15, 12, 0.75), 0 16px 22px rgba(0, 0, 0, 0.3);
+  transform: translateZ(24px) translateY(-2px);
+}
+
+.chip:active {
+  box-shadow: 0 3px 0 rgba(33, 15, 12, 0.75), 0 5px 10px rgba(0, 0, 0, 0.25);
+  transform: translateZ(10px) translateY(4px);
 }
 
 .chip.active {
