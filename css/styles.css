@@ -423,10 +423,10 @@ html, body {
 /* Soft controls */
 #soft-controls {
   position: fixed;
-  top: 56px;
+  bottom: 18px;
   right: 16px;
   z-index: 6;
-  display: grid;
+  display: flex;
   gap: 10px;
   padding: 12px;
   border: 1px solid rgba(232, 199, 106, 0.4);
@@ -463,7 +463,7 @@ html, body {
 
 @media (max-width: 520px) {
   #soft-controls {
-    top: 52px;
+    bottom: 10px;
     right: 10px;
     padding: 10px;
     gap: 8px;
