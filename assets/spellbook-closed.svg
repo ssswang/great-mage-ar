@@ -1,33 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 720" role="img" aria-label="Illustrated spellbook cover">
-  <defs>
-    <linearGradient id="leather" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#8b523b"/>
-      <stop offset=".48" stop-color="#4a261e"/>
-      <stop offset="1" stop-color="#251016"/>
-    </linearGradient>
-    <linearGradient id="pages" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#f7e4af"/>
-      <stop offset="1" stop-color="#bd9157"/>
-    </linearGradient>
-    <filter id="shadow" x="-25%" y="-20%" width="160%" height="160%">
-      <feDropShadow dx="14" dy="18" stdDeviation="12" flood-color="#090407" flood-opacity=".6"/>
-    </filter>
-  </defs>
-  <g filter="url(#shadow)">
-    <path d="M97 91 434 119 450 627 119 671Z" fill="url(#pages)" stroke="#5c3823" stroke-width="8"/>
-    <path d="M55 53 394 81 420 593 82 650Z" fill="url(#leather)" stroke="#1e0d11" stroke-width="17" stroke-linejoin="round"/>
-    <path d="M61 61 388 87 413 585 89 641" fill="none" stroke="#e0ad58" stroke-width="5" opacity=".9"/>
-    <path d="M53 54 96 58 123 647 82 650Z" fill="#2b1013" stroke="#b5773d" stroke-width="3"/>
-    <path d="M103 105 357 126 378 552 130 590Z" fill="none" stroke="#b7793f" stroke-width="3" opacity=".65"/>
-    <g fill="#9b672e" stroke="#f0bf67" stroke-width="3">
-      <path d="M56 56h43v13c-17 6-27 17-31 36H54Z"/>
-      <path d="M393 82h-39v13c16 6 25 17 29 35h24Z"/>
-      <path d="M82 649h43v-13c-17-6-27-17-31-36H80Z"/>
-      <path d="M419 593h-39v13c16 6 25 17 29 35h24Z"/>
-    </g>
-    <path d="M236 280 260 316 290 316 272 346 290 374 254 374 236 410 218 374 182 374 200 346 182 316 212 316Z"
-      fill="#321817" stroke="#f0bf67" stroke-width="7" stroke-linejoin="round"/>
-    <path d="M236 296 254 326 275 326 260 347 276 365 250 365 236 392 222 365 196 365 212 347 197 326 218 326Z"
-      fill="none" stroke="#ff9a42" stroke-width="3" stroke-linejoin="round"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 720" role="img" aria-label="Mid-fidelity spellbook cover">
+  <!-- Deliberately simple: one cover, one page block, spine, border, and sigil. -->
+  <path d="M107 96 431 119 444 624 128 662Z" fill="#c6a263" stroke="#5c3b21" stroke-width="8"/>
+  <path d="M66 55 390 80 414 590 91 645Z" fill="#3a2414" stroke="#1a120b" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M67 56 106 59 132 642 92 645Z" fill="#48231d" stroke="#e8c76a" stroke-width="3"/>
+  <path d="M102 97 357 117 378 553 129 586Z" fill="none" stroke="#e8c76a" stroke-width="5"/>
+  <path d="M236 279 260 316 290 316 272 346 290 374 254 374 236 410 218 374 182 374 200 346 182 316 212 316Z"
+    fill="#48231d" stroke="#e8c76a" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M236 296 254 326 275 326 260 347 276 365 250 365 236 392 222 365 196 365 212 347 197 326 218 326Z"
+    fill="none" stroke="#ff6b2c" stroke-width="4" stroke-linejoin="round"/>
 </svg>

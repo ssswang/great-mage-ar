@@ -961,7 +961,7 @@ export class ARRenderer {
     if (!fireball) return;
     const t = fireball.life / fireball.maxLife;
     const alpha = t < 0.7 ? 1 : 1 - (t - 0.7) / 0.3;
-    const r = 36 * fireball.scale;
+    const r = 108 * fireball.scale;
 
     ctx.save();
     ctx.globalAlpha = Math.max(0, alpha);
