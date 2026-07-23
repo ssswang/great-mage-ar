@@ -2,7 +2,7 @@
 
 
 **Scenario:** Task — Learn a new spell  
-**Fidelity:** Mid (interactive AR simulation beyond Figma; not production XR)
+**Fidelity:** Medium (interactive AR simulation beyond Figma; not production XR)
 
 Browser-based **pass-through AR demo** of the spell-learning loop:
 
@@ -44,11 +44,12 @@ great-mage-ar/
   js/renderer.js      # Canvas: book, runes, fireball
   js/runes.js         # Geometric templates + path scoring
   js/input.js         # Pointer + MediaPipe hands + voice
+  js/audio.js         # Manage audio option
   assets/*            # Images resources
   README.md
 ```
 
-## Hardware note (from design doc)
+## Hardware note 
 
 Production target is **pass-through MR headset / AR glasses** with bare-hand tracking. 
 
