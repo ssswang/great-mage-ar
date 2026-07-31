@@ -68,7 +68,7 @@ export class ARRenderer {
     const size = Math.min(this.w * 0.72, this.h * 0.44);
     this.runeLayout = {
       x: (this.w - size) / 2,
-      y: Math.max(86, this.h * 0.16),
+      y: Math.max(70, this.h * 0.10),
       w: size,
       h: size,
     };
@@ -211,14 +211,14 @@ export class ARRenderer {
     const { ctx, w, h, spellbook } = this;
     const open = clamp(spellbook.open, 0, 1);
     const cx = w / 2;
-    // Sit a bit lower so the larger open spread stays in frame
-    // Lower the book to create a dedicated space above it for the active rune.
-    const cy = h * 0.61 + spellbook.yOffset * 0.35;
+    // Keep the spellbook in the upper-middle area so it reads with the rune,
+    // rather than competing with the persistent controls at the bottom.
+    const cy = h * 0.54 + spellbook.yOffset * 0.35;
 
     // A deliberately oversized, weighty grimoire. Keep it responsive enough
     // to remain fully readable on a narrow phone screen.
     // Portrait proportions: a real tome, rather than a landscape placard.
-    const bw = Math.min(w * 0.56, 470);
+    const bw = Math.min(w * 0.64, 540);
     const bh = bw * 1.34;
     const thickness = bw * 0.15; // a substantial, old page block
 

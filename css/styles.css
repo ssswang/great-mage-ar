@@ -187,7 +187,8 @@ html, body {
 
 #spell-progress {
   align-self: center;
-  margin-top: 8px;
+  margin-top: 0;
+  transform: translateY(-8px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -239,7 +240,7 @@ html, body {
 #caption-bar {
   position: fixed;
   left: 50%;
-  top: 76%;
+  top: 68%;
   transform: translate(-50%, -50%);
   width: min(360px, 48vw);
   margin: 0;
@@ -253,7 +254,7 @@ html, body {
 #caption {
   max-width: 100%;
   text-align: center;
-  font-size: clamp(15px, 2.4vw, 18px);
+  font-size: clamp(30px, 4.8vw, 36px);
   line-height: 1.45;
   padding: 12px 20px;
   border-radius: 12px;
@@ -271,7 +272,7 @@ html, body {
   top: auto;
   transform: none;
   width: 100%;
-  font-size: 13px;
+  font-size: 26px;
   line-height: 1.4;
   color: rgba(255, 239, 201, 0.92);
   padding: 14px 16px 14px 42px;
@@ -313,9 +314,9 @@ html, body {
 .panel.hidden { display: none; }
 
 .panel-inner {
-  width: min(480px, 100%);
-  padding: 32px 28px;
-  border-radius: 20px;
+  width: min(960px, 92vw);
+  padding: 64px 56px;
+  border-radius: 28px;
   background:
     linear-gradient(160deg, rgba(58, 36, 20, 0.92), rgba(22, 16, 12, 0.95)),
     radial-gradient(circle at 20% 0%, rgba(232, 199, 106, 0.18), transparent 50%);
@@ -327,7 +328,7 @@ html, body {
 }
 
 .eyebrow {
-  font-size: 11px;
+  font-size: 16px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--gold);
@@ -342,12 +343,12 @@ html, body {
   margin-bottom: 14px;
 }
 
-.panel h1 { font-size: clamp(28px, 5vw, 36px); }
-.panel h2 { font-size: clamp(22px, 4vw, 28px); }
+.panel h1 { font-size: clamp(48px, 7vw, 72px); }
+.panel h2 { font-size: clamp(40px, 6vw, 56px); }
 
 .lede {
   color: rgba(243, 230, 200, 0.82);
-  font-size: 14.5px;
+  font-size: 22px;
   line-height: 1.55;
   margin-bottom: 18px;
 }
@@ -360,7 +361,7 @@ html, body {
 }
 
 .feature-list li {
-  font-size: 13.5px;
+  font-size: 20px;
   color: rgba(243, 230, 200, 0.9);
   padding-left: 18px;
   position: relative;
@@ -386,8 +387,8 @@ html, body {
   border: none;
   font-family: var(--font-ui);
   font-weight: 600;
-  font-size: 14px;
-  padding: 12px 18px;
+  font-size: 20px;
+  padding: 18px 28px;
   border-radius: 999px;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
@@ -415,7 +416,7 @@ html, body {
 }
 
 .fineprint {
-  font-size: 11.5px;
+  font-size: 15px;
   line-height: 1.4;
   color: rgba(243, 230, 200, 0.5);
 }
@@ -435,7 +436,7 @@ html, body {
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 230, 160, 0.12);
   backdrop-filter: blur(14px);
   pointer-events: auto;
-  transform: translate(-50%, -50%) perspective(900px) rotateX(8deg) rotateY(-7deg);
+  transform: translateX(-50%) perspective(900px) rotateX(8deg) rotateY(-7deg);
   transform-origin: center center;
   transform-style: preserve-3d;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -451,7 +452,7 @@ html, body {
 }
 
 #soft-controls:hover {
-  transform: translate(-50%, -50%) perspective(900px) rotateX(4deg) rotateY(-3deg) translateY(-3px);
+  transform: translateX(-50%) perspective(900px) rotateX(4deg) rotateY(-3deg) translateY(-3px);
   box-shadow: 0 20px 44px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 230, 160, 0.18);
 }
 
@@ -538,10 +539,15 @@ body.playing .chip {
 }
 
 @media (max-width: 520px) {
-  .panel-inner { padding: 24px 18px; }
-  #caption { font-size: 14px; padding: 10px 14px; }
-  #caption-bar { top: 72%; width: min(300px, 80vw); }
-  #hint { width: 100%; font-size: 12px; }
+  .panel-inner { width: min(960px, 92vw); padding: 32px 24px; }
+  .panel h1 { font-size: clamp(36px, 10vw, 48px); }
+  .panel h2 { font-size: clamp(30px, 8vw, 40px); }
+  .lede { font-size: 17px; }
+  .feature-list li { font-size: 16px; }
+  .btn { font-size: 17px; padding: 15px 20px; }
+  #caption { font-size: 28px; padding: 10px 14px; }
+  #caption-bar { top: 66%; width: min(300px, 80vw); }
+  #hint { width: 100%; font-size: 24px; }
   .btn-row { flex-direction: column; }
   .btn { width: 100%; }
 }

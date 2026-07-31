@@ -106,6 +106,7 @@ class Game {
 
   async start(withCamera) {
     this.audio.start();
+    this.audio.speak("Welcome, apprentice. Your journey to become a great mage begins now.");
     this._updateAudioButton();
     this.useCamera = withCamera;
     this.startPanel.classList.add("hidden");
