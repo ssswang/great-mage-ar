@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="794" height="1123" viewBox="0 0 794 1123" role="img" aria-labelledby="title desc">
-  <title id="title">Journey To Be A Great Mage Style Guide: UI Components</title>
-  <desc id="desc">A4 portrait style-guide page showing the rune plane, green fingertip cursor, caption above book states, and separated control plaque.</desc>
+  <title id="title">Journey to Be the Great Mage Style Guide: UI Components</title>
+  <desc id="desc">A4 portrait style-guide page showing the rune plane, green fingertip cursor, caption above book states, and separated control panel.</desc>
   <defs>
     <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2a1411"/><stop offset="1" stop-color="#0d080c"/></linearGradient>
     <filter id="shadow" x="-20%" y="-20%" width="150%" height="150%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity=".35"/></filter>
@@ -13,7 +13,7 @@
     </style>
   </defs>
   <rect width="794" height="1123" fill="#0b0a10"/>
-  <text x="56" y="84" class="display" font-size="38" font-weight="700" fill="#f3e6c8">Journey To Be A Great Mage</text>
+  <text x="56" y="84" class="display" font-size="38" font-weight="700" fill="#f3e6c8">Journey to Be the Great Mage</text>
   <text x="58" y="112" class="ui" font-size="12" letter-spacing="3" fill="#e8c76a">STYLE GUIDE / UI COMPONENTS</text>
   <line x1="56" y1="140" x2="738" y2="140" stroke="#e8c76a" stroke-opacity=".4"/>
   <text x="56" y="192" class="section">03 / SPATIAL UI COMPOSITION</text>
@@ -28,13 +28,19 @@
   </g>
   <g transform="translate(470 278)">
     <text x="0" y="0" class="section">FINGERTIP CURSOR</text>
-    <circle cx="96" cy="78" r="46" fill="#5dff9a" opacity=".18"/>
-    <circle cx="96" cy="78" r="28" fill="none" stroke="#5dff9a" stroke-width="7"/>
-    <circle cx="96" cy="78" r="13" fill="#ffe9a0"/>
-    <circle cx="91" cy="73" r="5" fill="#fff8e0"/>
-    <text x="0" y="145" class="body">Green ring and yellow core</text>
-    <text x="0" y="167" class="body">confirm the tracked fingertip.</text>
-    <text x="0" y="205" class="small">Never reuse green or yellow for errors.</text>
+    <circle cx="62" cy="78" r="40" fill="#ffe9a0" opacity=".18"/>
+    <circle cx="62" cy="78" r="26" fill="none" stroke="#ffe9a0" stroke-width="7"/>
+    <circle cx="62" cy="78" r="12" fill="#e8c76a"/>
+    <circle cx="57" cy="73" r="5" fill="#fff8e0"/>
+    <circle cx="170" cy="78" r="40" fill="#5dff9a" opacity=".18"/>
+    <circle cx="170" cy="78" r="26" fill="none" stroke="#5dff9a" stroke-width="7"/>
+    <circle cx="170" cy="78" r="12" fill="#5dff9a"/>
+    <circle cx="165" cy="73" r="5" fill="#fff8e0"/>
+    <text x="62" y="132" text-anchor="middle" class="small">Idle</text>
+    <text x="170" y="132" text-anchor="middle" class="small">Pinch detected</text>
+    <text x="0" y="166" class="body">Yellow: hand visible and ready.</text>
+    <text x="0" y="188" class="body">Green: pinch begins drawing.</text>
+    <text x="0" y="215" class="small">Rose remains reserved for off-path feedback.</text>
   </g>
 
   <!-- Caption and hint stay directly above the book. -->
@@ -47,35 +53,24 @@
     <text x="341" y="145" text-anchor="middle" class="ui" font-size="13" fill="#f3e6c8">Pinch to draw · open hand to finish</text>
   </g>
 
-  <!-- Closed and opened world-anchored spellbook states. -->
+  <!-- Actual cover SVG paired with the opened spellbook state. -->
   <g transform="translate(56 735)">
-    <rect width="350" height="220" rx="20" fill="#17121a" stroke="#e8c76a" stroke-opacity=".25"/>
-    <image href="spellbook-closed.svg" x="25" y="22" width="92" height="154" preserveAspectRatio="xMidYMid meet"/>
-    <path d="M127 99h15" stroke="#e8c76a" stroke-width="3" stroke-linecap="round"/>
-    <path d="m137 91 9 8-9 8" fill="none" stroke="#e8c76a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <g transform="translate(155 32)" filter="url(#shadow)">
-      <path d="M0 21Q37 2 79 17v121Q38 123 0 143Z" fill="#f3e6c8" stroke="#e8c76a" stroke-width="3"/>
-      <path d="M79 17Q121 2 158 21v122q-38-20-79-5Z" fill="#f3e6c8" stroke="#e8c76a" stroke-width="3"/>
-      <path d="M79 17v121" stroke="#8f6a38" stroke-width="4"/>
-      <path d="M17 51h43M17 68h48M17 85h38M97 51h43M97 68h47M97 85h35" stroke="#8f6a38" stroke-width="4" stroke-linecap="round" opacity=".78"/>
-      <path d="m111 103 13-22 13 22-13 22Z" fill="none" stroke="#ff6b2c" stroke-width="4"/>
+    <rect width="682" height="238" rx="20" fill="#17121a" stroke="#e8c76a" stroke-opacity=".25"/>
+    <image href="spellbook-closed.svg" x="84" y="17" width="108" height="181" preserveAspectRatio="xMidYMid meet"/>
+    <path d="M198 107h24" stroke="#e8c76a" stroke-width="3" stroke-linecap="round"/>
+    <path d="m212 98 10 9-10 9" fill="none" stroke="#e8c76a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(242 18)" filter="url(#shadow)">
+      <path d="M0 34Q76 1 160 25v166Q78 165 0 202Z" fill="#f3e6c8" stroke="#e8c76a" stroke-width="4"/>
+      <path d="M160 25Q244 1 320 34v168q-82-37-160-11Z" fill="#f3e6c8" stroke="#e8c76a" stroke-width="4"/>
+      <path d="M160 25v166" stroke="#8f6a38" stroke-width="5"/>
+      <path d="M28 70h88M28 96h96M28 122h73M193 70h90M193 96h94M193 122h76" stroke="#8f6a38" stroke-width="5" stroke-linecap="round" opacity=".74"/>
+      <path d="m240 150 18-31 18 31-18 31Z" fill="none" stroke="#ff6b2c" stroke-width="5"/>
     </g>
-    <text x="70" y="191" text-anchor="middle" class="small">Closed</text>
-    <text x="234" y="191" text-anchor="middle" class="small">Opened spellbook</text>
+    <text x="138" y="220" text-anchor="middle" class="small">Actual cover SVG</text>
+    <text x="402" y="220" text-anchor="middle" class="small">Opened spellbook</text>
   </g>
 
-  <!-- Control plaque deliberately lower and separate from instructional text. -->
-  <g transform="translate(432 775) skewX(-5)" filter="url(#shadow)">
-    <rect width="306" height="90" rx="20" fill="url(#panel)" stroke="#e8c76a" stroke-opacity=".65"/>
-    <rect x="12" y="15" width="132" height="60" rx="30" fill="#332019" stroke="#e8c76a"/>
-    <rect x="162" y="15" width="132" height="60" rx="30" fill="#332019" stroke="#e8c76a"/>
-    <text x="78" y="52" text-anchor="middle" class="ui" font-size="15" fill="#f3e6c8">Mic: Off</text>
-    <text x="228" y="52" text-anchor="middle" class="ui" font-size="15" fill="#ffe9a0">Audio: On</text>
-  </g>
-  <text x="432" y="890" class="small">Controls remain clear of instructions.</text>
-
-  <text x="56" y="992" class="section">SPATIAL RULE</text>
-  <text x="56" y="1020" class="body">Captions lead into the book. Persistent controls remain lower and visually separate.</text>
-  <text x="56" y="1050" class="small">The interaction-feedback example and gesture rules continue on page 3.</text>
-  <text x="56" y="1092" class="small">Page 2 of 3 · Journey To Be A Great Mage mid-fidelity demo</text>
+  <text x="56" y="1016" class="section">SPATIAL RULE</text>
+  <text x="56" y="1044" class="body">Captions lead into the centered book states. Controls appear separately on page 4.</text>
+  <text x="56" y="1072" class="small">The opened spread mirrors the live canvas layout used in the prototype.</text>
 </svg>

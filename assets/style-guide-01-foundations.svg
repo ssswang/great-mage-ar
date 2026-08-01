@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="794" height="1123" viewBox="0 0 794 1123" role="img" aria-labelledby="title desc">
-  <title id="title">Journey To Be A Great Mage Style Guide: Foundations</title>
-  <desc id="desc">A4 portrait style-guide page showing the Journey To Be A Great Mage colour palette and typography.</desc>
+  <title id="title">Journey to Be the Great Mage Style Guide: Foundations</title>
+  <desc id="desc">A4 portrait style-guide page showing the Journey to Be the Great Mage colour palette and typography.</desc>
   <defs>
     <style>
       .display { font-family: Cinzel, Georgia, serif; }
@@ -13,7 +13,7 @@
   </defs>
   <rect width="794" height="1123" fill="#0b0a10"/>
   <circle cx="720" cy="35" r="230" fill="#ff6b2c" opacity=".04"/>
-  <text x="56" y="84" class="display" font-size="38" font-weight="700" fill="#f3e6c8">Journey To Be A Great Mage</text>
+  <text x="56" y="84" class="display" font-size="38" font-weight="700" fill="#f3e6c8">Journey to Be the Great Mage</text>
   <text x="58" y="112" class="ui" font-size="12" letter-spacing="3" fill="#e8c76a">STYLE GUIDE / FOUNDATIONS</text>
   <line x1="56" y1="140" x2="738" y2="140" stroke="#e8c76a" stroke-opacity=".4"/>
 
@@ -40,5 +40,4 @@
   <text x="80" y="986" class="small">UI / INTER, SYSTEM UI, SANS-SERIF</text>
   <text x="80" y="1028" class="ui" font-size="30" font-weight="600" fill="#f3e6c8">Trace the rune in your own way.</text>
   <text x="80" y="1060" class="small">Captions 30-36 px · hints 24-26 px · panel text 17-72 px</text>
-  <text x="56" y="1092" class="small">Page 1 of 3 · Journey To Be A Great Mage mid-fidelity demo</text>
 </svg>
