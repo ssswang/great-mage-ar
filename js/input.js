@@ -169,7 +169,6 @@ export class InputManager {
           const handSize = Math.hypot(wrist.x - middleBase.x, wrist.y - middleBase.y);
           const pinchDistance = Math.hypot(tip.x - thumb.x, tip.y - thumb.y);
           const pinch = pinchDistance < Math.max(0.075, handSize * 0.52);
-
           if (pinch && !this._pinchDown) {
             this._pinchDown = true;
             this.isDown = true;
@@ -195,7 +194,7 @@ export class InputManager {
 }
 
 /**
- * Lightweight voice commands between sequences: "next", "again", "cast", "open".
+ * Lightweight voice commands between sequences: "open sesame", "open", "next", "previous", "study", "again", "cast".
  */
 export class VoiceCommands {
   constructor(onCommand) {
@@ -212,7 +211,10 @@ export class VoiceCommands {
       const last = e.results[e.results.length - 1];
       if (!last?.isFinal) return;
       const text = last[0].transcript.toLowerCase().trim();
-      if (/next|continue|open/.test(text)) this.onCommand?.("next");
+      if (/study|learn/.test(text)) this.onCommand?.("study");
+      else if (/open|sesame/.test(text)) this.onCommand?.("open");
+      else if (/previous|prev|back/.test(text)) this.onCommand?.("previous");
+      else if (/next|continue/.test(text)) this.onCommand?.("next");
       else if (/again|retry|restart/.test(text)) this.onCommand?.("again");
       else if (/cast|fire|spell/.test(text)) this.onCommand?.("cast");
     };

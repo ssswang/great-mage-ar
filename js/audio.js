@@ -4,6 +4,9 @@ export class AudioManager {
     this.enabled = true;
     this.context = null;
     this.lastSpoken = "";
+    this.speaking = false;
+    this.speechCooldownUntil = 0;
+    this.speechToken = 0;
   }
 
   start() {
@@ -16,20 +19,42 @@ export class AudioManager {
 
   toggle() {
     this.enabled = !this.enabled;
-    if (!this.enabled) window.speechSynthesis?.cancel?.();
+    if (!this.enabled) {
+      this.speechToken += 1;
+      this.speaking = false;
+      this.speechCooldownUntil = Date.now() + 600;
+      window.speechSynthesis?.cancel?.();
+    }
     else this.start();
     return this.enabled;
   }
 
   speak(text) {
-    if (!this.enabled || !window.speechSynthesis || !text || text === this.lastSpoken) return;
+    if (!this.enabled || !window.speechSynthesis || !text || text === this.lastSpoken) return Promise.resolve();
     this.lastSpoken = text;
+    const token = ++this.speechToken;
+    this.speaking = true;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.05;
     utterance.pitch = 0.92;
     utterance.volume = 0.9;
-    window.speechSynthesis.speak(utterance);
+    return new Promise((resolve) => {
+      const finish = () => {
+        if (token === this.speechToken) {
+          this.speaking = false;
+          this.speechCooldownUntil = Date.now() + 700;
+        }
+        resolve();
+      };
+      utterance.onend = finish;
+      utterance.onerror = finish;
+      window.speechSynthesis.speak(utterance);
+    });
+  }
+
+  get isNarrating() {
+    return this.speaking || Date.now() < this.speechCooldownUntil;
   }
 
   success() {

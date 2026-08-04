@@ -10,6 +10,12 @@ const CORRECT = "#5dff9a";
 const WRONG = "#ff5d6c";
 const IDLE = "#9bb7ff";
 
+const SPELL_CATALOGUE = [
+  { title: "Cinder Familiar", locked: true },
+  { title: "Flame Ward", locked: true },
+  { title: "Summon Fireball", locked: false },
+];
+
 export class ARRenderer {
   constructor(canvas) {
     this.canvas = canvas;
@@ -645,13 +651,17 @@ export class ARRenderer {
     ctx.arc(c0.x, c0.y, 5, 0, Math.PI * 1.5);
     ctx.stroke();
 
+    const cataloguePage = SPELL_CATALOGUE[page] ?? SPELL_CATALOGUE[0];
     if (isLeft) {
       ctx.fillStyle = "rgba(90, 50, 20, 0.72)";
       ctx.font = `600 ${Math.max(10, pageW * 0.07)}px Cinzel, serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       const title = lerpPt(lerpPt(tl, tr, 0.5), lerpPt(bl, br, 0.5), 0.1);
-      ctx.fillText("Apprentice Notes", title.x, title.y);
+      ctx.fillText("Spell Catalogue", title.x, title.y);
+      ctx.font = `500 ${Math.max(9, pageW * 0.048)}px Inter, sans-serif`;
+      const pageNumber = lerpPt(lerpPt(tl, tr, 0.5), lerpPt(bl, br, 0.5), 0.88);
+      ctx.fillText(`Page ${page + 1} of 3`, pageNumber.x, pageNumber.y);
     } else {
       // Rune sketch with slight perspective
       const rc = lerpPt(lerpPt(tl, tr, 0.5), lerpPt(bl, br, 0.5), 0.58);
@@ -674,8 +684,12 @@ export class ARRenderer {
       ctx.fillStyle = "rgba(90, 50, 20, 0.75)";
       ctx.font = `600 ${Math.max(10, pageW * 0.065)}px Cinzel, serif`;
       ctx.textAlign = "center";
+      const spellTitle = lerpPt(lerpPt(tl, tr, 0.5), lerpPt(bl, br, 0.5), 0.16);
+      ctx.fillText(cataloguePage.title, spellTitle.x, spellTitle.y);
+      ctx.font = `500 ${Math.max(9, pageW * 0.048)}px Inter, sans-serif`;
       const label = lerpPt(lerpPt(tl, tr, 0.5), lerpPt(bl, br, 0.5), 0.88);
-      ctx.fillText(page === 0 ? "Flame Sigil" : "Page " + (page + 1), label.x, label.y);
+      ctx.fillText(cataloguePage.locked ? "Locked - not enough experience" : 'Say "Study" to learn', label.x, label.y);
+
     }
 
     // Spine-side shade (depth into gutter)
@@ -886,7 +900,7 @@ export class ARRenderer {
     // User path with state color
     if (this.userPath.length > 1) {
       let color = IDLE;
-      if (this.feedbackState === "tracing" || this.feedbackState === "almost") color = CORRECT;
+      if (this.feedbackState === "tracing" || this.feedbackState === "almost") color = GOLD_B;
       if (this.feedbackState === "offpath") color = WRONG;
       if (this.feedbackState === "success") color = CORRECT;
       if (this.feedbackState === "fail") color = WRONG;

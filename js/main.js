@@ -25,7 +25,7 @@ const PHASE = {
   IDLE: "idle",
   BOOK_APPEAR: "book_appear",
   BOOK_OPEN: "book_open",
-  PAGE_FLIP: "page_flip",
+  SPELL_SELECT: "spell_select",
   DEMO: "demo",
   TRACE: "trace",
   SUCCESS_FLASH: "success_flash",
@@ -69,6 +69,7 @@ class Game {
     this.combinePaths = [];
     this.bookReadyForSwipe = false;
     this.bookSwipeStart = null;
+    this.spellPage = 0;
 
     this.input = new InputManager({
       onMove: (x, y, down) => this._onMove(x, y, down),
@@ -95,7 +96,7 @@ class Game {
       }
       const on = this.voice.toggle();
       this._updateVoiceButton();
-      this.setCaption(on ? "Microphone on — try “next”, “again”, or “cast”." : "Microphone off.");
+      this.setCaption(on ? "Microphone on" : "Microphone off.");
     });
     this.btnAudio.addEventListener("click", () => {
       const on = this.audio.toggle();
@@ -106,17 +107,23 @@ class Game {
 
   async start(withCamera) {
     this.audio.start();
-    this.audio.speak("Welcome, apprentice. Your journey to become a great mage begins now.");
+    if (this.voice.supported) this.voice.start();
+    this._updateVoiceButton();
+    const welcomeLine = "Welcome, apprentice. Your journey to become a great mage begins now.";
+    this.caption.textContent = welcomeLine;
+    this.caption.style.opacity = "1";
+    this.welcomeSpeech = this.audio.speak(welcomeLine);
     this._updateAudioButton();
     this.useCamera = withCamera;
     this.startPanel.classList.add("hidden");
     this.endPanel.classList.add("hidden");
     this.softControls.classList.remove("hidden");
     this.inputStatus.classList.remove("hidden");
-    this.spellProgress.classList.remove("hidden");
+    this.spellProgress.classList.add("hidden");
     document.body.classList.add("playing");
     this.fingertip.classList.remove("hidden");
 
+    this.spellPage = 0;
     this._buildRuneDots();
     this.spellName.textContent = this.spell.name;
 
@@ -148,6 +155,9 @@ class Game {
     this.runeIndex = 0;
     this.combinePaths = [];
     this.renderer.clearEffects();
+    // Keep the first spoken line intact before later captions can speak.
+    await this.welcomeSpeech;
+    this.welcomeSpeech = null;
     this._enter(PHASE.BOOK_APPEAR);
     this.lastTs = performance.now();
     requestAnimationFrame(this._loop);
@@ -213,6 +223,7 @@ class Game {
   }
 
   setCaption(text) {
+    if (this.welcomeSpeech) return;
     this.caption.style.opacity = "0";
     clearTimeout(this.captionQueue);
     this.captionQueue = setTimeout(() => {
@@ -291,9 +302,10 @@ class Game {
         this.setCaption("It opens — leather warm with old gold light.");
         break;
 
-      case PHASE.PAGE_FLIP:
-        this.renderer.setSpellbook({ page: 0, yOffset: 90 });
-        this.setHint(this.voice.supported ? 'Say “next” or wait' : "Wait a moment…");
+      case PHASE.SPELL_SELECT:
+        this.spellPage = 0;
+        this.renderer.setSpellbook({ open: 1, page: this.spellPage, yOffset: 90 });
+        this._showSpellPage();
         break;
 
       case PHASE.DEMO: {
@@ -408,17 +420,33 @@ class Game {
   }
 
   _onVoice(cmd) {
+    // Ignore recognition of the app's own narration, including magic words.
+    if (this.audio.isNarrating) return;
     if (cmd === "again") {
       this.restart(this.unguided);
       return;
     }
-    if (cmd === "next" && this.phase === PHASE.BOOK_APPEAR && this.bookReadyForSwipe) {
+    if ((cmd === "open" || cmd === "next") && this.phase === PHASE.BOOK_APPEAR && this.bookReadyForSwipe) {
       this._enter(PHASE.BOOK_OPEN);
       return;
     }
-    if (cmd === "next" && (this.phase === PHASE.PAGE_FLIP || this.phase === PHASE.DEMO)) {
-      if (this.phase === PHASE.PAGE_FLIP) this._enter(PHASE.DEMO);
-      else if (this.phase === PHASE.DEMO) this._enter(PHASE.TRACE);
+    if ((cmd === "next" || cmd === "previous") && this.phase === PHASE.SPELL_SELECT) {
+      const direction = cmd === "next" ? 1 : -1;
+      const nextPage = Math.max(0, Math.min(2, this.spellPage + direction));
+      if (nextPage === this.spellPage) {
+        this.setHint(direction > 0 ? "This is the last spell page." : "This is the first spell page.");
+        return;
+      }
+      this.spellPage = nextPage;
+      this._showSpellPage();
+      return;
+    }
+    if (cmd === "next" && this.phase === PHASE.DEMO) {
+      this._enter(PHASE.TRACE);
+      return;
+    }
+    if (cmd === "study" && this.phase === PHASE.SPELL_SELECT) {
+      this._learnSelectedSpell();
       return;
     }
     if (cmd === "cast" && this.runeIndex >= this.spell.runes.length - 1) {
@@ -429,7 +457,7 @@ class Game {
   _onDown(x, y) {
     this._updateFingertip(x, y, true);
     if (this.phase === PHASE.BOOK_APPEAR && this.bookReadyForSwipe) {
-      this.bookSwipeStart = { x, y };
+      this.bookSwipeStart = { x, y, startedAt: performance.now() };
       return;
     }
     if (!this.canTrace) return;
@@ -442,16 +470,19 @@ class Game {
 
   _onMove(x, y, down) {
     this._updateFingertip(x, y, down || this.tracer.isDrawing);
+    // Book navigation uses a deliberate, slow fingertip swipe in hand mode.
+    if (this.input.mode === "hand" && this.phase === PHASE.BOOK_APPEAR && this.bookReadyForSwipe && !this.bookSwipeStart) {
+      this.bookSwipeStart = { x, y, startedAt: performance.now() };
+    }
     if (this._tryOpenBook(x, y)) return;
     if (this.tracer.isDrawing) {
       this.tracer.move(x, y);
-      const fb = this.tracer.liveFeedback();
       this.renderer.setRuneVisual({
         userPath: this.tracer.userPath,
-        feedbackState: fb.state === "offpath" ? "offpath" : "tracing",
+        feedbackState: "tracing",
       });
-      this.fingertip.classList.toggle("offpath", fb.state === "offpath");
-      this.fingertip.classList.toggle("drawing", fb.state !== "offpath");
+      this.fingertip.classList.remove("offpath");
+      this.fingertip.classList.add("drawing");
     }
   }
 
@@ -461,7 +492,7 @@ class Game {
     if (this.phase === PHASE.BOOK_APPEAR && this.bookReadyForSwipe) {
       if (!this._tryOpenBook(x, y)) {
         this.bookSwipeStart = null;
-        this.setHint("Swipe left across the book to open it");
+        this.setHint("Slowly swipe left across the book to open it");
       }
       return;
     }
@@ -561,16 +592,47 @@ class Game {
     }
     const dx = x - this.bookSwipeStart.x;
     const dy = y - this.bookSwipeStart.y;
-    // Camera tracking has natural jitter, so accept a short, mostly horizontal
-    // sweep. Detect it mid-pinch as well as on release.
-    const minDistance = this.input.mode === "hand" ? 32 : 60;
-    const maxVerticalDrift = this.input.mode === "hand" ? 170 : 110;
+    if (performance.now() - this.bookSwipeStart.startedAt < 240) return false;
+    // Camera tracking has natural jitter, so accept a deliberate, mostly horizontal
+    // fingertip sweep. Detect it while moving as well as on release.
+    const minDistance = this.input.mode === "hand" ? 95 : 80;
+    const maxVerticalDrift = this.input.mode === "hand" ? 75 : 85;
     if (dx <= -minDistance && Math.abs(dy) <= maxVerticalDrift) {
       this.bookSwipeStart = null;
       this._enter(PHASE.BOOK_OPEN);
       return true;
     }
     return false;
+  }
+
+  _showSpellPage() {
+    const pages = [
+      { title: "Cinder Familiar", locked: true },
+      { title: "Flame Ward", locked: true },
+      { title: "Summon Fireball", locked: false },
+    ];
+    const page = pages[this.spellPage];
+    this.renderer.setSpellbook({ page: this.spellPage, glow: 0.9, yOffset: 90 });
+    this.setCaption(
+      page.locked
+        ? `Page ${this.spellPage + 1}: ${page.title}. Locked - not enough experience.`
+        : "Page 3: Summon Fireball. You have found a spell of gathered flame. Say Study to begin."
+    );
+    this.setHint('Say "Next" or "Previous" to turn pages · say "Study" to learn');
+  }
+
+  _learnSelectedSpell() {
+    const pages = ["Cinder Familiar", "Flame Ward", "Summon Fireball"];
+    if (this.spellPage < 2) {
+      this.audio.fail();
+      this.setCaption(`${pages[this.spellPage]} is locked - you do not have enough experience to learn it yet.`);
+      this.setHint("Slowly swipe left to find another spell.");
+      return;
+    }
+    this.spellName.textContent = this.spell.name;
+    this._buildRuneDots();
+    this.spellProgress.classList.remove("hidden");
+    this._enter(PHASE.DEMO);
   }
 
   _loop(ts) {
@@ -611,13 +673,13 @@ class Game {
           this.bookReadyForSwipe = true;
           this.setHint(
             this.input.mode === "hand"
-              ? "Pinch, then sweep left a short distance to open"
-              : "Swipe left across the book to open"
+              ? 'Say "Open Sesame", or slowly swipe left to open'
+              : 'Say "Open Sesame", or slowly swipe left across the book to open'
           );
         }
         if (this.phaseT >= 5 && !this.bookAppearCaptionDismissed) {
           this.bookAppearCaptionDismissed = true;
-          this.clearCaption();
+          this.setCaption("Speak the magic words, Open Sesame, or slowly swipe left to open the spellbook.");
         }
         break;
       }
@@ -631,18 +693,16 @@ class Game {
         if (this.phaseT >= 5 && !this.bookOpenCaptionDismissed) {
           this.bookOpenCaptionDismissed = true;
           this.clearCaption();
-          this._enter(PHASE.PAGE_FLIP);
+          this._enter(PHASE.SPELL_SELECT);
         }
         break;
       }
 
-      case PHASE.PAGE_FLIP: {
+      case PHASE.SPELL_SELECT: {
         this.renderer.setSpellbook({
           glow: 0.85 + 0.15 * Math.sin(this.phaseT * 2.5),
           yOffset: 90 + Math.sin(this.phaseT * 1.5) * 4,
         });
-        // Auto advance after reading beat (or voice "next")
-        if (this.phaseT > 2.8) this._enter(PHASE.DEMO);
         break;
       }
 

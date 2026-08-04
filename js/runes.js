@@ -81,8 +81,8 @@ function shapeDistance(a, b) {
 export const SPELLS = {
   flame: {
     id: "flame",
-    name: "Flame Sigil",
-    description: "Ignite a fireball from three geometric runes.",
+    name: "Summon Fireball",
+    description: "Summon a fireball from three geometric runes.",
     runes: [
       {
         id: "ignite",
