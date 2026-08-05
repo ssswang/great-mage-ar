@@ -23,6 +23,7 @@ export class InputManager {
     this._video = null;
     this._handActive = false;
     this._pinchDown = false;
+    this._pinchFrames = 0;
     this._handSwipeStart = null;
     this._handSwipeCooldownUntil = 0;
     this._pointerSwipeStart = null;
@@ -203,7 +204,14 @@ export class InputManager {
           // reliable than a fixed distance when the hand is near or far away.
           const handSize = Math.hypot(wrist.x - middleBase.x, wrist.y - middleBase.y);
           const pinchDistance = Math.hypot(tip.x - thumb.x, tip.y - thumb.y);
-          const pinch = pinchDistance < Math.max(0.075, handSize * 0.52);
+          // A closed thumb/index pinch is deliberately stricter than a casual
+          // pointing pose. Requiring a few consecutive frames avoids a false
+          // pinch while the tracker is settling on a hand.
+          const pinchCandidate = pinchDistance < Math.max(0.06, handSize * 0.34);
+          this._pinchFrames = pinchCandidate ? this._pinchFrames + 1 : 0;
+          const pinch = this._pinchDown
+            ? pinchDistance < Math.max(0.075, handSize * 0.42)
+            : this._pinchFrames >= 3;
           const fingertipIds = [8, 12, 16, 20];
           const jointIds = [6, 10, 14, 18];
           const extendedFingers = fingertipIds.reduce((count, fingertipId, index) => {

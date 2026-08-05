@@ -69,6 +69,8 @@ class Game {
     this.bookReadyForSwipe = false;
     this.bookSwipeStart = null;
     this.spellPage = 0;
+    this.studyPinchTimer = null;
+    this.studyGestureReady = false;
 
     this.input = new InputManager({
       onMove: (x, y, down) => this._onMove(x, y, down),
@@ -225,14 +227,16 @@ class Game {
   }
 
   setCaption(text) {
-    if (this.welcomeSpeech) return;
+    if (this.welcomeSpeech) return Promise.resolve();
     this.caption.style.opacity = "0";
     clearTimeout(this.captionQueue);
-    this.captionQueue = setTimeout(() => {
-      this.caption.textContent = text;
-      this.caption.style.opacity = "1";
-      this.audio.speak(text);
-    }, 120);
+    return new Promise((resolve) => {
+      this.captionQueue = setTimeout(() => {
+        this.caption.textContent = text;
+        this.caption.style.opacity = "1";
+        this.audio.speak(text).then(resolve);
+      }, 120);
+    });
   }
 
   clearCaption() {
@@ -453,6 +457,7 @@ class Game {
 
   _onHandSwipe(direction) {
     if (this.phase !== PHASE.SPELL_SELECT) return;
+    if (this.spellPage === 2 && !this.studyGestureReady) return;
     const nextPage = Math.max(0, Math.min(2, this.spellPage + (direction === "left" ? 1 : -1)));
     if (nextPage === this.spellPage) {
       this.setHint(direction === "left" ? "This is the last spell page." : "This is the first spell page.");
@@ -467,7 +472,7 @@ class Game {
   }
 
   _onDoubleClick() {
-    if (this.phase === PHASE.SPELL_SELECT && this.spellPage === 2) {
+    if (this.phase === PHASE.SPELL_SELECT && this.spellPage === 2 && this.studyGestureReady) {
       this._learnSelectedSpell();
     }
   }
@@ -478,8 +483,16 @@ class Game {
       this.bookSwipeStart = { x, y, startedAt: performance.now() };
       return;
     }
-    if (this.phase === PHASE.SPELL_SELECT && this.input.mode === "hand") {
-      this._learnSelectedSpell();
+    if (this.phase === PHASE.SPELL_SELECT && this.input.mode === "hand" && this.spellPage === 2 && this.studyGestureReady) {
+      // A study action should be intentional: ignore a momentary camera pinch
+      // and only continue if the hand remains pinched for a short hold.
+      clearTimeout(this.studyPinchTimer);
+      this.studyPinchTimer = setTimeout(() => {
+        this.studyPinchTimer = null;
+        if (this.phase === PHASE.SPELL_SELECT && this.spellPage === 2 && this.input.mode === "hand" && this.input.isDown) {
+          this._learnSelectedSpell();
+        }
+      }, 450);
       return;
     }
     if (!this.canTrace) return;
@@ -511,6 +524,8 @@ class Game {
   _onUp(x, y) {
     this._updateFingertip(x, y, false);
     this.fingertip.classList.remove("drawing", "offpath");
+    clearTimeout(this.studyPinchTimer);
+    this.studyPinchTimer = null;
     if (this.phase === PHASE.BOOK_APPEAR && this.bookReadyForSwipe) {
       if (!this._tryOpenBook(x, y)) {
         this.bookSwipeStart = null;
@@ -635,11 +650,19 @@ class Game {
     ];
     const page = pages[this.spellPage];
     this.renderer.setSpellbook({ page: this.spellPage, glow: 0.9, yOffset: 90 });
-    this.setCaption(
+    this.studyGestureReady = false;
+    const narration = this.setCaption(
       page.locked
         ? `Page ${this.spellPage + 1}: ${page.title}. Locked - not enough experience. Say Next or Previous, or swipe left or right.`
-        : "Page 3: Summon Fireball. You have found a spell of gathered flame. Pinch, double-click, or say study to learn."
+        : "Page 3: Summon Fireball. You have found a spell of gathered flame. Hold a steady pinch, double-click, or say study to learn."
     );
+    if (!page.locked) {
+      narration.then(() => {
+        if (this.phase === PHASE.SPELL_SELECT && this.spellPage === 2) {
+          this.studyGestureReady = true;
+        }
+      });
+    }
   }
 
   _learnSelectedSpell() {
