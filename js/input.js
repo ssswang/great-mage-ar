@@ -4,11 +4,13 @@
  */
 
 export class InputManager {
-  constructor({ onMove, onDown, onUp, onHandSwipe }) {
+  constructor({ onMove, onDown, onUp, onHandSwipe, onPointerSwipe, onDoubleClick }) {
     this.onMove = onMove;
     this.onDown = onDown;
     this.onUp = onUp;
     this.onHandSwipe = onHandSwipe;
+    this.onPointerSwipe = onPointerSwipe;
+    this.onDoubleClick = onDoubleClick;
 
     this.mode = "pointer"; // pointer | hand
     this.x = window.innerWidth / 2;
@@ -23,6 +25,7 @@ export class InputManager {
     this._pinchDown = false;
     this._handSwipeStart = null;
     this._handSwipeCooldownUntil = 0;
+    this._pointerSwipeStart = null;
     this._raf = null;
     this._smoothedTip = null;
     this._handSwipeStart = null;
@@ -31,6 +34,7 @@ export class InputManager {
     this._onPointerMove = this._onPointerMove.bind(this);
     this._onPointerDown = this._onPointerDown.bind(this);
     this._onPointerUp = this._onPointerUp.bind(this);
+    this._onDoubleClick = this._onDoubleClick.bind(this);
   }
 
   enablePointer() {
@@ -40,6 +44,7 @@ export class InputManager {
     window.addEventListener("pointerdown", this._onPointerDown);
     window.addEventListener("pointerup", this._onPointerUp);
     window.addEventListener("pointercancel", this._onPointerUp);
+    window.addEventListener("dblclick", this._onDoubleClick);
   }
 
   disable() {
@@ -48,6 +53,7 @@ export class InputManager {
     window.removeEventListener("pointerdown", this._onPointerDown);
     window.removeEventListener("pointerup", this._onPointerUp);
     window.removeEventListener("pointercancel", this._onPointerUp);
+    window.removeEventListener("dblclick", this._onDoubleClick);
     this.stopHands();
   }
 
@@ -60,6 +66,14 @@ export class InputManager {
     if (!this.enabled || this.mode === "hand") return;
     this.x = e.clientX;
     this.y = e.clientY;
+    if (this.isDown && this._pointerSwipeStart) {
+      const dx = this.x - this._pointerSwipeStart.x;
+      const dy = this.y - this._pointerSwipeStart.y;
+      if (Math.abs(dx) >= 25 && Math.abs(dy) <= 220) {
+        this._pointerSwipeStart = null;
+        this.onPointerSwipe?.(dx < 0 ? "left" : "right");
+      }
+    }
     this.onMove?.(this.x, this.y, this.isDown);
   }
 
@@ -69,6 +83,7 @@ export class InputManager {
     this.isDown = true;
     this.x = e.clientX;
     this.y = e.clientY;
+    this._pointerSwipeStart = { x: this.x, y: this.y };
     this.onDown?.(this.x, this.y);
   }
 
@@ -76,7 +91,22 @@ export class InputManager {
     if (!this.enabled || this.mode === "hand") return;
     if (!this.isDown) return;
     this.isDown = false;
+    this.x = e.clientX;
+    this.y = e.clientY;
+    if (this._pointerSwipeStart) {
+      const dx = this.x - this._pointerSwipeStart.x;
+      const dy = this.y - this._pointerSwipeStart.y;
+      if (Math.abs(dx) >= 25 && Math.abs(dy) <= 220) {
+        this.onPointerSwipe?.(dx < 0 ? "left" : "right");
+      }
+    }
+    this._pointerSwipeStart = null;
     this.onUp?.(this.x, this.y);
+  }
+
+  _onDoubleClick(e) {
+    if (!this.enabled || this.mode === "hand" || this._ignoredTarget(e.target)) return;
+    this.onDoubleClick?.(e.clientX, e.clientY);
   }
 
   /**

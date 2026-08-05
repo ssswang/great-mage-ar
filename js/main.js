@@ -75,6 +75,8 @@ class Game {
       onDown: (x, y) => this._onDown(x, y),
       onUp: (x, y) => this._onUp(x, y),
       onHandSwipe: (direction) => this._onHandSwipe(direction),
+      onPointerSwipe: (direction) => this._onPointerSwipe(direction),
+      onDoubleClick: () => this._onDoubleClick(),
     });
 
     this.voice = new VoiceCommands((cmd) => this._onVoice(cmd));
@@ -460,6 +462,16 @@ class Game {
     this._showSpellPage();
   }
 
+  _onPointerSwipe(direction) {
+    this._onHandSwipe(direction);
+  }
+
+  _onDoubleClick() {
+    if (this.phase === PHASE.SPELL_SELECT && this.spellPage === 2) {
+      this._learnSelectedSpell();
+    }
+  }
+
   _onDown(x, y) {
     this._updateFingertip(x, y, true);
     if (this.phase === PHASE.BOOK_APPEAR && this.bookReadyForSwipe) {
@@ -602,11 +614,11 @@ class Game {
     }
     const dx = x - this.bookSwipeStart.x;
     const dy = y - this.bookSwipeStart.y;
-    if (performance.now() - this.bookSwipeStart.startedAt < 240) return false;
+    if (this.input.mode === "hand" && performance.now() - this.bookSwipeStart.startedAt < 240) return false;
     // Camera tracking has natural jitter, so accept a deliberate, mostly horizontal
     // fingertip sweep. Detect it while moving as well as on release.
-    const minDistance = this.input.mode === "hand" ? 95 : 80;
-    const maxVerticalDrift = this.input.mode === "hand" ? 75 : 85;
+    const minDistance = this.input.mode === "hand" ? 95 : 45;
+    const maxVerticalDrift = this.input.mode === "hand" ? 75 : 140;
     if (dx <= -minDistance && Math.abs(dy) <= maxVerticalDrift) {
       this.bookSwipeStart = null;
       this._enter(PHASE.BOOK_OPEN);
@@ -625,8 +637,8 @@ class Game {
     this.renderer.setSpellbook({ page: this.spellPage, glow: 0.9, yOffset: 90 });
     this.setCaption(
       page.locked
-        ? `Page ${this.spellPage + 1}: ${page.title}. Locked - not enough experience. Say Next or Previous, or swipe an open hand left or right. Pinch or say Study to learn.`
-        : "Page 3: Summon Fireball. You have found a spell of gathered flame. Say Next or Previous, or swipe an open hand left or right. Pinch or say Study to begin."
+        ? `Page ${this.spellPage + 1}: ${page.title}. Locked - not enough experience. Say Next or Previous, or swipe left or right.`
+        : "Page 3: Summon Fireball. You have found a spell of gathered flame. Pinch, double-click, or say study to learn."
     );
   }
 
