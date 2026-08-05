@@ -520,6 +520,7 @@ class Game {
       });
       this.combinePaths.push([...this.tracer.userPath]);
       this._enter(PHASE.SUCCESS_FLASH);
+      this.setCaption("Rune sealed. The next pattern will appear shortly.");
       // auto-advance — no confirm button (interaction decision)
       const finishedRune = this.runeIndex;
       setTimeout(() => {
@@ -546,12 +547,11 @@ class Game {
         } else if (finishedRune < this.spell.runes.length - 1) {
           this.runeIndex = finishedRune + 1;
           this._updateDots();
-          this.setCaption("Rune sealed. Next pattern appears…");
-          setTimeout(() => this._enter(PHASE.DEMO), 700);
+          this._enter(PHASE.DEMO);
         } else {
           this._enter(PHASE.COMBINE);
         }
-      }, 650);
+      }, 3600);
     } else {
       this.audio.fail();
       // Auto-retry — no Retry button

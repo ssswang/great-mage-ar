@@ -242,7 +242,7 @@ html, body {
   left: 50%;
   top: 59%;
   transform: translate(-50%, -50%);
-  width: min(360px, 48vw);
+  width: min(700px, 82vw);
   margin: 0;
   padding: 0;
   display: flex;
@@ -254,11 +254,13 @@ html, body {
 #caption {
   max-width: 100%;
   text-align: center;
+  font-family: var(--font-display);
+  font-weight: 600;
   font-size: clamp(30px, 4.8vw, 36px);
   line-height: 1.45;
   padding: 12px 20px;
   border-radius: 12px;
-  background: var(--caption-bg);
+  background: rgba(0, 0, 0, 0.52);
   border: 1px solid rgba(255,255,255,0.08);
   backdrop-filter: blur(14px);
   box-shadow: 0 8px 32px rgba(0,0,0,0.35);
@@ -546,7 +548,7 @@ body.playing .chip {
   .feature-list li { font-size: 16px; }
   .btn { font-size: 17px; padding: 15px 20px; }
   #caption { font-size: 28px; padding: 10px 14px; }
-  #caption-bar { top: 58%; width: min(300px, 80vw); }
+  #caption-bar { top: 58%; width: min(560px, 90vw); }
   #hint { width: 100%; font-size: 24px; }
   .btn-row { flex-direction: column; }
   .btn { width: 100%; }
