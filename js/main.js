@@ -42,7 +42,6 @@ class Game {
     this.fallback = $("camera-fallback");
     this.fingertip = $("fingertip");
     this.caption = $("caption");
-    this.hint = $("hint");
     this.spellProgress = $("spell-progress");
     this.runeDots = $("rune-dots");
     this.spellName = $("spell-name");
@@ -75,6 +74,7 @@ class Game {
       onMove: (x, y, down) => this._onMove(x, y, down),
       onDown: (x, y) => this._onDown(x, y),
       onUp: (x, y) => this._onUp(x, y),
+      onHandSwipe: (direction) => this._onHandSwipe(direction),
     });
 
     this.voice = new VoiceCommands((cmd) => this._onVoice(cmd));
@@ -252,13 +252,7 @@ class Game {
   }
 
   setHint(text) {
-    if (!text) {
-      this.hint.classList.add("hidden");
-      this.hint.textContent = "";
-      return;
-    }
-    this.hint.textContent = text;
-    this.hint.classList.remove("hidden");
+    // Instructions now live in captions; retained as a no-op for older flows.
   }
 
   _enter(phase) {
@@ -304,6 +298,7 @@ class Game {
 
       case PHASE.SPELL_SELECT:
         this.spellPage = 0;
+        this.spellProgress.classList.add("hidden");
         this.renderer.setSpellbook({ open: 1, page: this.spellPage, yOffset: 90 });
         this._showSpellPage();
         break;
@@ -349,7 +344,7 @@ class Game {
           feedbackState: "idle",
         });
         this.setCaption(
-          `Trace the ${rune.label} rune. Match its shape in your own way.`
+          `Trace the ${rune.label} rune. Pinch to draw, then open your hand to finish.`
         );
         this.setHint(
           this.input.mode === "hand"
@@ -454,10 +449,25 @@ class Game {
     }
   }
 
+  _onHandSwipe(direction) {
+    if (this.phase !== PHASE.SPELL_SELECT) return;
+    const nextPage = Math.max(0, Math.min(2, this.spellPage + (direction === "left" ? 1 : -1)));
+    if (nextPage === this.spellPage) {
+      this.setHint(direction === "left" ? "This is the last spell page." : "This is the first spell page.");
+      return;
+    }
+    this.spellPage = nextPage;
+    this._showSpellPage();
+  }
+
   _onDown(x, y) {
     this._updateFingertip(x, y, true);
     if (this.phase === PHASE.BOOK_APPEAR && this.bookReadyForSwipe) {
       this.bookSwipeStart = { x, y, startedAt: performance.now() };
+      return;
+    }
+    if (this.phase === PHASE.SPELL_SELECT && this.input.mode === "hand") {
+      this._learnSelectedSpell();
       return;
     }
     if (!this.canTrace) return;
@@ -615,18 +625,15 @@ class Game {
     this.renderer.setSpellbook({ page: this.spellPage, glow: 0.9, yOffset: 90 });
     this.setCaption(
       page.locked
-        ? `Page ${this.spellPage + 1}: ${page.title}. Locked - not enough experience.`
-        : "Page 3: Summon Fireball. You have found a spell of gathered flame. Say Study to begin."
+        ? `Page ${this.spellPage + 1}: ${page.title}. Locked - not enough experience. Say Next or Previous, or swipe an open hand left or right. Pinch or say Study to learn.`
+        : "Page 3: Summon Fireball. You have found a spell of gathered flame. Say Next or Previous, or swipe an open hand left or right. Pinch or say Study to begin."
     );
-    this.setHint('Say "Next" or "Previous" to turn pages · say "Study" to learn');
   }
 
   _learnSelectedSpell() {
     const pages = ["Cinder Familiar", "Flame Ward", "Summon Fireball"];
     if (this.spellPage < 2) {
       this.audio.fail();
-      this.setCaption(`${pages[this.spellPage]} is locked - you do not have enough experience to learn it yet.`);
-      this.setHint("Slowly swipe left to find another spell.");
       return;
     }
     this.spellName.textContent = this.spell.name;

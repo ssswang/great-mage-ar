@@ -4,10 +4,11 @@
  */
 
 export class InputManager {
-  constructor({ onMove, onDown, onUp }) {
+  constructor({ onMove, onDown, onUp, onHandSwipe }) {
     this.onMove = onMove;
     this.onDown = onDown;
     this.onUp = onUp;
+    this.onHandSwipe = onHandSwipe;
 
     this.mode = "pointer"; // pointer | hand
     this.x = window.innerWidth / 2;
@@ -20,8 +21,12 @@ export class InputManager {
     this._video = null;
     this._handActive = false;
     this._pinchDown = false;
+    this._handSwipeStart = null;
+    this._handSwipeCooldownUntil = 0;
     this._raf = null;
     this._smoothedTip = null;
+    this._handSwipeStart = null;
+    this._handSwipeCooldownUntil = 0;
 
     this._onPointerMove = this._onPointerMove.bind(this);
     this._onPointerDown = this._onPointerDown.bind(this);
@@ -169,6 +174,35 @@ export class InputManager {
           const handSize = Math.hypot(wrist.x - middleBase.x, wrist.y - middleBase.y);
           const pinchDistance = Math.hypot(tip.x - thumb.x, tip.y - thumb.y);
           const pinch = pinchDistance < Math.max(0.075, handSize * 0.52);
+          const fingertipIds = [8, 12, 16, 20];
+          const jointIds = [6, 10, 14, 18];
+          const extendedFingers = fingertipIds.reduce((count, fingertipId, index) => {
+            const fingertipDistance = Math.hypot(
+              result.landmarks[0][fingertipId].x - wrist.x,
+              result.landmarks[0][fingertipId].y - wrist.y
+            );
+            const jointDistance = Math.hypot(
+              result.landmarks[0][jointIds[index]].x - wrist.x,
+              result.landmarks[0][jointIds[index]].y - wrist.y
+            );
+            return count + (fingertipDistance > jointDistance * 1.18 ? 1 : 0);
+          }, 0);
+          const openHand = !pinch && extendedFingers >= 3;
+          const palmX = left + (1 - (wrist.x + middleBase.x) / 2) * renderW;
+          const palmY = top + ((wrist.y + middleBase.y) / 2) * renderH;
+
+          if (openHand && now >= this._handSwipeCooldownUntil) {
+            if (!this._handSwipeStart) this._handSwipeStart = { x: palmX, y: palmY, at: now };
+            const dx = palmX - this._handSwipeStart.x;
+            const dy = palmY - this._handSwipeStart.y;
+            if (now - this._handSwipeStart.at >= 280 && Math.abs(dx) >= 110 && Math.abs(dy) <= 85) {
+              this._handSwipeStart = null;
+              this._handSwipeCooldownUntil = now + 800;
+              this.onHandSwipe?.(dx < 0 ? "left" : "right");
+            }
+          } else {
+            this._handSwipeStart = null;
+          }
           if (pinch && !this._pinchDown) {
             this._pinchDown = true;
             this.isDown = true;
